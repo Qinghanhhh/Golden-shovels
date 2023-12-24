@@ -8,7 +8,7 @@ using namespace cocos2d;
 class showHPMP : public cocos2d::Sprite
 {
 public:
-    virtual bool init();
+    showHPMP();
     static showHPMP* showHPMP::create();
 
 public:
@@ -17,7 +17,7 @@ public:
     //设置血条前景  
     void setForegroundTexture(const char* pName);
     //设置总血量  
-    void setTotalProgress(float total);
+    void setTotalProgress(float data);
     //设置当前血量  
     void setCurrentProgress(float progress);
     //得到当前血量  
@@ -30,8 +30,8 @@ private:
     void setForegroundTextureRect(const CCRect& rect);
 
 private:
-    Sprite* P_back;//背景血条  
-    Sprite* P_front;//前景血条  
+    CCSprite* P_back;//背景血条  
+    CCSprite* P_front;//前景血条  
     float total;//总血量  
     float P_current;//当前血量  
     float P_scale;//放大倍数  
