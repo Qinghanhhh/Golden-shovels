@@ -2,22 +2,19 @@
 #define  _APP_DELEGATE_H_
 
 #include "cocos2d.h"
-#include "ChessShop.h"
-#include "Player.h"
+#include "SmallHero.h"
+#include "ui/CocosGUI.h"
 
 class  AppDelegate : private cocos2d::Application
 {
 public:
     AppDelegate();
     virtual ~AppDelegate();
-
     virtual void initGLContextAttrs();
-
- 
     virtual bool applicationDidFinishLaunching();
     virtual void applicationDidEnterBackground();
     virtual void applicationWillEnterForeground();
 };
 
-#endif // _APP_DELEGATE_H_
+#endif
 
