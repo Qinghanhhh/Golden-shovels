@@ -41,7 +41,9 @@ int Card::getCardImageIndex() const {
     return cardImageIndex;
 }
 
- void Card::setOriginalPosition(const Vec2& position) {
+//回归原位
+
+void Card::setOriginalPosition(const Vec2& position) {
         originalPosition = position;
   }
 
@@ -91,6 +93,7 @@ void Card::setStarLevel(int count,Card*card)
         card->addChild(star,0);
     }
 }
+
 //onEnter 方法对于设置触摸监听是必须的，而这个方法是在节点加入场景时自动被 Cocos2d-x 调用的
 //你无需手动调用它来实现触摸功能，只要确保 Card 对象被正确地添加到了场景中。
 void Card::onEnter() {
