@@ -21,18 +21,22 @@ showHPMP* showHPMP::create()
     return nullptr;
 }
 
-void showHPMP::setBackgroundTexture(const char* pName)
+void showHPMP::setBackgroundTexture(const std::string& pName)
 {
     P_back = CCSprite::create(pName);
     this->addChild(P_back);
 }
 
-void showHPMP::setForegroundTexture(const char* pName)
+void showHPMP::setForegroundTexture(const std::string& pName)
 {
     P_front = CCSprite::create(pName);
     P_front->setAnchorPoint(ccp(0.0f, 0.5f));//ÉèÖÃÃªµã  
     P_front->setPosition(ccp(-P_front->getContentSize().width * 0.5f, 0));
     this->addChild(P_front);
+}
+
+void showHPMP::changeColor(const std::string& pName) {
+    P_front->setTexture(pName);
 }
 
 void showHPMP::setTotalProgress(float data)

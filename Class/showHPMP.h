@@ -13,9 +13,10 @@ public:
 
 public:
     //设置血条背景  
-    void setBackgroundTexture(const char* pName);
+    void setBackgroundTexture(const std::string& pName);
     //设置血条前景  
-    void setForegroundTexture(const char* pName);
+    void setForegroundTexture(const std::string& pName);
+    void changeColor(const std::string& pName);
     //设置总血量  
     void setTotalProgress(float data);
     //设置当前血量  

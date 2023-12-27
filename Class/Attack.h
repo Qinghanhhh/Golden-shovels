@@ -18,6 +18,7 @@ public:
 	void GetAttack(double atk);
 	void GetDistance();//计算当前位置到目标的距离
 	static Attack* Attack::create(const std::string& filename);
+	void SetName(std::string filename);
 	virtual	void update(float dt);
 	void destroy();
 	
@@ -25,9 +26,11 @@ public:
 private:
 	Hero* target;//攻击目标
 	Vec2 targetPos;//攻击目标位置
+	Vec2 direction;
 	double attack;//发起攻击的英雄的攻击力
 	double distance;//距离目标的距离
 	int isHit = 0;//是否命中
+	std::string name;
 	//int mark;//标记//0代表未飞行 1代表飞行中
 	};
 

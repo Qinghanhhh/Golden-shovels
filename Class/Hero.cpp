@@ -54,33 +54,36 @@ void Hero::SetHeroOn() {
     this->getParent()->addChild(heroMP,2);
 
     this->setPosition(heroPos);
+    this->setScale(0.65);
     //血条初始化
     Vec2 posBlood;
     posBlood.x = heroPos.x;
-    posBlood.y = heroPos.y + this->getContentSize().height / 2 +30;
+    posBlood.y = heroPos.y + this->getContentSize().height / 2-35;
     heroHP->setPosition(posBlood);
-    heroHP->setScale(2.2f);
     heroHP->setBackgroundTexture("Blood-back.png");
-    heroHP->setForegroundTexture("Blood-front.png");
+    heroHP->setForegroundTexture(heroName + "Blood-front.png");
     heroHP->setTotalProgress(baseInfo->HP);
     heroHP->setCurrentProgress(baseInfo->HP);
-    heroHP->setScale(0.8);
+    heroHP->setScale(0.5);
     //蓝条初始化
     Vec2 posMP;
     posMP.x = heroPos.x;
     posMP.y = posBlood.y - 14;
     heroMP->setPosition(posMP);
-    heroMP->setScale(2.2f);
     heroMP->setBackgroundTexture("MP-back.png");
     heroMP->setForegroundTexture("MP-front.png");
     heroMP->setTotalProgress(baseInfo->MP);
     heroMP->setCurrentProgress(0.0f);
-    heroMP->setScale(0.8);
+    heroMP->setScale(0.5);
     //英雄设为可见
     this->setVisible(1);
     SetAction();
     ison = 1;
 }
+
+//void Hero::ChangeHPColor() {
+//    heroHP->changeColor("RedBlood-front.png");
+//}
 
 //初始化移动和攻击动画
 void Hero::SetAction() {
@@ -117,7 +120,7 @@ void Hero::StartBattle(Hero* target) {
     auto attackcopy = attackAction;
     MoveBy* stop = MoveBy::create(baseInfo->atkspeed - 1, Vec2(0, 0));//用来做停顿
     Sequence* Atk = Sequence::create(attackAction, stop, NULL);
-    this->runAction(RepeatForever::create(Atk));
+    //this->runAction(RepeatForever::create(Atk));
 
     atktimer = baseInfo->atkspeed * 60;//60是帧数
     curAtkTimer = 0;
@@ -128,18 +131,19 @@ void Hero::StartBattle(Hero* target) {
 Vec2 Hero::GetTargetPos() {
     Vec2 enemyPos = atkTarget->getPosition();
     double distance = CountDistance();
-    Vec2 direction = Vec2(enemyPos.x - heroPos.x, enemyPos.y - this->getPosition().y) / distance;
+    Vec2 direction = Vec2(enemyPos.x - this->getPosition().x, enemyPos.y - this->getPosition().y) / distance;
     Vec2 tarPos;
     if (distance - baseInfo->atkrange > 0)
         tarPos = direction * (distance - baseInfo->atkrange) + this->getPosition();
     else
         tarPos = (0, 0);
-    return tarPos;
+    return direction;
 }
 
 //移动到指定位置
 void Hero::HeroMoveTo() {
     Vec2 pos = GetTargetPos();
+    direction = pos;
     double distance = CountDistance();
     movetime = distance/ baseInfo->movespeed;
 
@@ -152,26 +156,40 @@ void Hero::HeroMoveTo() {
     }
     Animation* ani2 = Animation::createWithSpriteFrames(spriteFrameVec2, 0.5);
     auto ani = Animate::create(ani2);
-    auto movecopy = moveAction;
-    Repeat* rep = Repeat::create(ani,movetime);
+    Animate* movecopy = moveAction;
+    //Repeat* rep = Repeat::create(movecopy,movetime);
     this->runAction(RepeatForever::create(ani));//开始移动动作
     //this->runAction(rep);
     MoveTo* heroMoveTo = MoveTo::create(4,pos);
     //
     Sequence* seq = Sequence::create(heroMoveTo, CallFuncN::create(CC_CALLBACK_1(Hero::StopMove, this)), NULL);
-    auto spa = Spawn::createWithTwoActions(rep, heroMoveTo);
-    this->runAction(seq);
+    //auto spa = Spawn::createWithTwoActions(rep, heroMoveTo);
+    //this->runAction(seq);
+
+    this->schedule(schedule_selector(Hero::Movetimer), 0.01f);
+
 
     Vec2 posBlood;
     posBlood.x = pos.x;
     posBlood.y = pos.y + this->getContentSize().height / 2 + 30;
     Vec2 posMP;
     MoveTo* HPMoveTo = MoveTo::create(4, posBlood);
-    heroHP->runAction(HPMoveTo);
+    //heroHP->runAction(HPMoveTo);
     posMP.x = pos.x;
     posMP.y = posBlood.y - 14;
     MoveTo* MPMoveTo = MoveTo::create(4, posMP);
-    heroMP->runAction(MPMoveTo);
+    //heroMP->runAction(MPMoveTo);
+}
+
+void Hero::Movetimer(float delta) {
+    this->setPosition(this->getPosition() + direction/2);//按钮精灵向右移动2像素
+    heroHP->setPosition(heroHP->getPosition() + direction / 2);
+    heroMP->setPosition(heroMP->getPosition() + direction / 2);
+    if (CountDistance() <= baseInfo->atkrange) {
+        this->unschedule(schedule_selector(Hero::Movetimer));
+        this->stopAllActions();
+    }
+
 }
 
 //停止动作
@@ -209,8 +227,14 @@ void Hero::HeroAttack() {
     this->runAction(Atk);
     //this->runAction(attackAction);//开始攻击动作
     heroAttack = Attack::create(heroName);
-    heroAttack->setScale(2);
-    this->getParent()->addChild(heroAttack);//相当于把攻击物加为英雄的兄弟
+    heroAttack->setScale(1.5);
+    this->getParent()->addChild(heroAttack,5);//相当于把攻击物加为英雄的兄弟
+    if (heroMP->getCurrentProgress() >= baseInfo->MP) {
+        heroAttack->GetAttack(baseInfo->attack*3);
+        heroAttack->setScale(2.3);
+        heroMP->setCurrentProgress(0);
+    }
+    else
     heroAttack->GetAttack(baseInfo->attack);
     heroAttack->SetPosition(this->getPosition(), this->getContentSize());
     heroAttack->setVisible(1);
@@ -230,13 +254,36 @@ void Hero::ChangeHP(float data) {
     baseInfo->HP = heroHP->getCurrentProgress();
 }
 
-void Hero::ChangeMP(float data) {
+void Hero::ChangeMP() {
     if(!isFull)
     heroMP->setCurrentProgress(heroMP->getCurrentProgress() + 10);
 }
 
 void Hero::update(float dt)
 {
+    if (heroHP->getCurrentProgress() <= 0)
+    {
+        this->isdead = 1;//死亡
+        this->setVisible(0);//或许更改为淡出会更好，视后期效果而定
+        heroHP->setVisible(0);
+        heroMP->setVisible(0);
+    }
+
+    if (isdead)//如果死了就停止攻击
+    {
+        isatk = 0;
+        heroAttack->setVisible(0);
+        this->stopAllActions();
+        this->unscheduleUpdate();//停止该英雄的所有定时器
+        this->Destory();
+    }
+
+    if (atkTarget->IsDead()) {
+        isatk = 0;
+        heroAttack->setVisible(0);
+        this->stopAllActions();
+    }
+    
     //if (curAtkTimer == atktimer) {//到了发动攻击的时间
     //    isatk = 1;//设置攻击状态为正在攻击//isatk何时置零？
     //    //this->runAction(attackAction);//开始攻击动作
@@ -266,11 +313,12 @@ void Hero::update(float dt)
             //Sequence* Atk = Sequence::create(atk, stop, NULL);
             //this->runAction(Atk);
             //this->runAction(RepeatForever::create(Atk));
-            if (curAtkTimer == atktimer) {//到了发动攻击的时间
+            if (curAtkTimer == atktimer&&atkTarget->IsDead()==0) {//到了发动攻击的时间
                 isatk = 1;//设置攻击状态为正在攻击//isatk何时置零？
                 //this->runAction(attackAction);//开始攻击动作
                 //this->schedule(schedule_selector(Hero::HeroAttack), baseInfo->atkspeed);//每隔相应秒数发动攻击
                 HeroAttack();
+                ChangeMP();
             }
             curAtkTimer++;//当前时间加一
             if (curAtkTimer > atktimer)
@@ -299,21 +347,9 @@ void Hero::update(float dt)
         if (curMoveTimer >= movetimer|| CountDistance() <= baseInfo->atkrange) {
             ismove = 0;
             atktimer = baseInfo->atkspeed * 60;
-            curAtkTimer = atktimer;
+            curAtkTimer = atktimer-20;
         }
         
-    }
-    if (baseInfo->HP <= 0)
-    {
-        this->isdead = 1;//死亡
-        this->setVisible(0);//或许更改为淡出会更好，视后期效果而定
-    }
-
-    if (isdead)//如果死了就停止攻击
-    {
-        isatk = 0;
-        heroAttack->setVisible(0);
-        this->unscheduleUpdate();//停止该英雄的所有定时器
     }
     isupdate = 1;
 }
@@ -321,4 +357,25 @@ void Hero::update(float dt)
 
 bool Hero::IsDead() {
     return isdead;
+}
+
+bool Hero::IsOn() {
+    return ison;
+}
+
+void Hero::SetDead(int data) {
+    isdead = data;
+}
+
+Hero* Hero::ShowTarget() {
+    return atkTarget;
+}
+
+void Hero::Destory() {
+    if (isupdate) {
+        this->unscheduleAllSelectors();
+        this->unscheduleUpdate();
+        this->stopAllActions();
+        isupdate = 0;
+    }
 }
