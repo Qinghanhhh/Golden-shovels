@@ -54,16 +54,16 @@ void Attack::SetTarget(Hero* atktarget)
 	//this->runAction(attackMoveTo);
 	//this->scheduleUpdate();
 	if (isHit == 0)
-		this->schedule(schedule_selector(Attack::timer), 0.001f);
+		this->schedule(schedule_selector(Attack::timer), 0.0005f);
 }
 
 
 void Attack::timer(float delta) {//这段代码每0.05s执行一次
 	CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();//获取屏幕的尺寸、位置信息等
-	this->setPosition(this->getPosition() + direction/4);//按钮精灵向右移动2像素
+	this->setPosition(this->getPosition() + direction/8);//按钮精灵向右移动2像素
 	GetDistance();
 	//if (present_position == target_position)
-	if (distance <= 50){//如果按钮精灵超过屏幕的1/4
+	if (distance <= 70){//如果按钮精灵超过屏幕的1/4
 		if (!isHit) {
 			isHit = 1;//设为已命中
 			target->ChangeHP(attack);//target攻击目标是一个Hero类

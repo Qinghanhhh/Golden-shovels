@@ -12,14 +12,15 @@
 //	playerNeedExperience = addMaxExperience;
 //}
 //
-//void Player::changeplayerBlood(int hurt)
-//{
-//	playerBlood -= hurt;
-//	if (playerBlood <= 0)
-//	{
-//		playerIsDead = true;//Íæ¼ÒËÀÍö
-//	}
-//}
+void Player::changeplayerBlood(int hurt)
+{
+	playerBlood -= hurt;
+    myHP->setCurrentProgress(playerBlood);
+	if (playerBlood <= 0)
+	{
+		playerIsDead = true;//Íæ¼ÒËÀÍö
+	}
+}
 //
 //int Player::getplayerMoney() const
 //{
@@ -120,6 +121,21 @@ Player* Player::create()
 
 Player::Player() {
     playerLevel = 2;
+    playerIsDead = 0;
+    playerBlood = 100;
+    HeroInit();
+}
+
+void Player::SetHP(Vec2 pos) {
+    //ÑªÌõ³õÊ¼»¯
+    myHP = new showHPMP();
+    myHP->setPosition(pos);
+    myHP->setBackgroundTexture("Blood-back.png");
+    myHP->setForegroundTexture("LiliaBlood-front.png");
+    myHP->setTotalProgress(playerBlood);
+    myHP->setCurrentProgress(playerBlood);
+    myHP->setScale(1.2);
+    this->getParent()->addChild(myHP, 2);
 }
 
 int Player::GetLv() {
@@ -127,13 +143,19 @@ int Player::GetLv() {
 }
 
 void Player::SetHero(Hero* hero) {
-    chessWarPlayer.push_back(hero);
+    chessWarPlayer[heroNum].SetBaseInfo(hero->GetBaseInfo(),hero->GetName(),hero->GetHeroPos());
+    //chessWarPlayer.onBattle[chessWarPlayer.heroNum].SetHeroOn();
+    chessWarPlayer[heroNum].SetOn(1);
+    heroNum++;
 }
 
-std::vector <Hero*> Player::GetWarHero() {
-	return chessWarPlayer;
+void Player::HeroInit(){
 }
 
-site* Player::GetHeroPos() {
-	return HeroPos;
+class Hero* Player::GetWarHero() {
+    return chessWarPlayer;
+}
+
+int Player::GetHeroNum() {
+    return heroNum;
 }

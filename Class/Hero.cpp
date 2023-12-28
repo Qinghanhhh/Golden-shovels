@@ -16,10 +16,13 @@ Hero::Hero(){
     isdead=0;//是否死亡
     isatk=0;//是否正在攻击
     ismove=0;//是否正在移动
+    isrecover = 0;
     isFull=0;//蓝条是否已满（是否释放大招）
     isupdate=0;//是否在update
     moveAction=NULL;//移动动作序列
     attackAction=NULL;//攻击动作序列
+
+
 }
 
 Hero* Hero::create(const std::string& filename)
@@ -42,41 +45,50 @@ void Hero::SetBaseInfo(heroInformation* info, std::string name,Vec2 pos) {
     this->setVisible(0);
 }
 
+void Hero::HPInit(){
+    heroHP = showHPMP::create();
+    this->getParent()->addChild(heroHP, 5);
+    heroMP = showHPMP::create();
+    this->getParent()->addChild(heroMP, 5);
+}
+
 void Hero::SetHeroOn() {
     //heroAttack = Attack::create(heroName);
     //this->getParent()->addChild(heroAttack);//相当于把攻击物加为英雄的兄弟
     //heroAttack->GetAttack(baseInfo->attack);
     //heroAttack->setVisible(0);
 
-    heroHP = showHPMP::create();
-    this->getParent()->addChild(heroHP,2);
-    heroMP = showHPMP::create();
-    this->getParent()->addChild(heroMP,2);
+    //heroHP = showHPMP::create();
+    //this->getParent()->addChild(heroHP,2);
+    //heroMP = showHPMP::create();
+    //this->getParent()->addChild(heroMP,2);
 
     this->setPosition(heroPos);
-    this->setScale(0.65);
+    this->setScale(0.55);
     //血条初始化
     Vec2 posBlood;
     posBlood.x = heroPos.x;
-    posBlood.y = heroPos.y + this->getContentSize().height / 2-35;
+    posBlood.y = heroPos.y + this->getContentSize().height / 2-55;
     heroHP->setPosition(posBlood);
     heroHP->setBackgroundTexture("Blood-back.png");
     heroHP->setForegroundTexture(heroName + "Blood-front.png");
     heroHP->setTotalProgress(baseInfo->HP);
     heroHP->setCurrentProgress(baseInfo->HP);
-    heroHP->setScale(0.5);
+    heroHP->setScale(0.4);
     //蓝条初始化
     Vec2 posMP;
     posMP.x = heroPos.x;
-    posMP.y = posBlood.y - 14;
+    posMP.y = posBlood.y - 10;
     heroMP->setPosition(posMP);
     heroMP->setBackgroundTexture("MP-back.png");
     heroMP->setForegroundTexture("MP-front.png");
     heroMP->setTotalProgress(baseInfo->MP);
     heroMP->setCurrentProgress(0.0f);
-    heroMP->setScale(0.5);
+    heroMP->setScale(0.4);
     //英雄设为可见
     this->setVisible(1);
+    heroHP->setVisible(1);
+    heroMP->setVisible(1);
     SetAction();
     ison = 1;
 }
@@ -146,26 +158,8 @@ void Hero::HeroMoveTo() {
     direction = pos;
     double distance = CountDistance();
     movetime = distance/ baseInfo->movespeed;
-
-    Vector<SpriteFrame*>spriteFrameVec2;
-    for (int i = 1; i <= 2; i++) {
-        char imageName[20];
-        sprintf(imageName, "-move%d.png", i);
-        SpriteFrame* spriteFrame = SpriteFrame::create(heroName + imageName, Rect(0, 0, this->getContentSize().width, this->getContentSize().height));
-        spriteFrameVec2.pushBack(spriteFrame);
-    }
-    Animation* ani2 = Animation::createWithSpriteFrames(spriteFrameVec2, 0.5);
-    auto ani = Animate::create(ani2);
-    Animate* movecopy = moveAction;
-    //Repeat* rep = Repeat::create(movecopy,movetime);
-    this->runAction(RepeatForever::create(ani));//开始移动动作
-    //this->runAction(rep);
-    MoveTo* heroMoveTo = MoveTo::create(4,pos);
-    //
-    Sequence* seq = Sequence::create(heroMoveTo, CallFuncN::create(CC_CALLBACK_1(Hero::StopMove, this)), NULL);
-    //auto spa = Spawn::createWithTwoActions(rep, heroMoveTo);
-    //this->runAction(seq);
-
+    moveActTimer = 100;
+    curMoveActTimer = 100;
     this->schedule(schedule_selector(Hero::Movetimer), 0.01f);
 
 
@@ -182,6 +176,22 @@ void Hero::HeroMoveTo() {
 }
 
 void Hero::Movetimer(float delta) {
+    Vector<SpriteFrame*>spriteFrameVec2;
+    for (int i = 1; i <= 2; i++) {
+        char imageName[20];
+        sprintf(imageName, "-move%d.png", i);
+        SpriteFrame* spriteFrame = SpriteFrame::create(heroName + imageName, Rect(0, 0, this->getContentSize().width, this->getContentSize().height));
+        spriteFrameVec2.pushBack(spriteFrame);
+    }
+    Animation* ani2 = Animation::createWithSpriteFrames(spriteFrameVec2, 0.5);
+    auto ani = Animate::create(ani2);
+    if (curMoveActTimer == moveActTimer ) {//到了发动攻击的时间
+        this->runAction(ani);
+    }
+    curMoveActTimer++;//当前时间加一
+    if (curMoveActTimer > moveActTimer)
+        curMoveActTimer = 0;
+
     this->setPosition(this->getPosition() + direction/2);//按钮精灵向右移动2像素
     heroHP->setPosition(heroHP->getPosition() + direction / 2);
     heroMP->setPosition(heroMP->getPosition() + direction / 2);
@@ -230,12 +240,16 @@ void Hero::HeroAttack() {
     heroAttack->setScale(1.5);
     this->getParent()->addChild(heroAttack,5);//相当于把攻击物加为英雄的兄弟
     if (heroMP->getCurrentProgress() >= baseInfo->MP) {
-        heroAttack->GetAttack(baseInfo->attack*3);
+        heroAttack->GetAttack(baseInfo->attack * 3);
         heroAttack->setScale(2.3);
         heroMP->setCurrentProgress(0);
+        if (heroName == "Lilia" || heroName == "En-Lilia")
+            isrecover = 1;//全体回血
     }
-    else
-    heroAttack->GetAttack(baseInfo->attack);
+    else {
+        isrecover = 0;
+        heroAttack->GetAttack(baseInfo->attack);
+    }
     heroAttack->SetPosition(this->getPosition(), this->getContentSize());
     heroAttack->setVisible(1);
     float flyTime = CountDistance() / baseInfo->attackSpeed;
@@ -251,7 +265,6 @@ void Hero::HeroAttack() {
 
 void Hero::ChangeHP(float data) {
     heroHP->setCurrentProgress(heroHP->getCurrentProgress() - data + baseInfo->defence);
-    baseInfo->HP = heroHP->getCurrentProgress();
 }
 
 void Hero::ChangeMP() {
@@ -363,8 +376,23 @@ bool Hero::IsOn() {
     return ison;
 }
 
+bool Hero::IsRecover() {
+    return isrecover;
+}
+
+void Hero::SetRecover() {
+    isrecover = 0;
+}
+
+void Hero::SetOn(int data) {
+    ison = 1;
+}
+
 void Hero::SetDead(int data) {
     isdead = data;
+    //this->unscheduleUpdate();
+    heroHP->setCurrentProgress(baseInfo->HP);
+    heroMP->setCurrentProgress(0);
 }
 
 Hero* Hero::ShowTarget() {
@@ -378,4 +406,16 @@ void Hero::Destory() {
         this->stopAllActions();
         isupdate = 0;
     }
+}
+
+heroInformation* Hero::GetBaseInfo() {
+    return baseInfo;
+}
+
+std::string Hero::GetName() {
+    return heroName;
+}
+
+Vec2 Hero::GetHeroPos() {
+    return heroPos;
 }

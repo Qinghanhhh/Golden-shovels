@@ -27,6 +27,7 @@ public:
 	Hero();
 	static Hero* create(const std::string& filename);
 	void SetBaseInfo(heroInformation* info, std::string name,Vec2 pos);//设置英雄初始信息
+	void HPInit();
 	void SetHeroOn();//设置英雄上场，包括血条初始化，根据heroPos设置位置
 	void SetAction();//初始化移动和攻击动作序列
 	Vec2 GetTargetPos();//根据攻击目标得到英雄的战斗位置
@@ -42,12 +43,19 @@ public:
 	double GetAtk();
 	bool IsDead();
 	bool IsOn();
+	bool IsRecover();
+	void SetRecover();
+	void SetOn(int data);
 	void SetDead(int data);
 	Hero* ShowTarget();
 	double CountDistance();
 	CREATE_FUNC(Hero);
 	virtual	void update(float dt);//每一帧更新一次英雄状态
 	void Destory();
+
+	heroInformation* GetBaseInfo();
+	std::string GetName();
+	Vec2 GetHeroPos();
 private:
 	std::string heroName;         //卡牌名，图片名称
 	heroInformation* baseInfo;
@@ -62,6 +70,7 @@ private:
 	bool ismove;//是否正在移动
 	bool isFull;//蓝条是否已满（是否释放大招）
 	bool isupdate;//是否在update
+	bool isrecover;//是否为队友恢复血量
 	Animate* moveAction;//移动动作序列
 	Animate* attackAction;//攻击动作序列
 	float atktimer;//攻击计时器
@@ -69,7 +78,8 @@ private:
 	float movetime;//移动需要的时间
 	float movetimer;//移动计时器
 	float curMoveTimer;//记录当前时间的计时器
-
+	float moveActTimer;
+	float curMoveActTimer;
 	Vec2 direction;
 };
 

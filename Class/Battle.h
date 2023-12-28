@@ -11,6 +11,8 @@
 #define MaxDis 1000000
 USING_NS_CC;
 
+struct site;
+class Player;
 class Battle :public Layer {
 public:
 	CREATE_FUNC(Battle);
@@ -18,30 +20,24 @@ public:
 	static Battle* createLayer();
 	void Start();//战斗正式开始
 	void SetPlayer(Player* my, Player* en);//加载双方玩家
-	void SetHeroPos();
 	void SetHeroData();//设置场上棋子的信息，应该是备战时完成
 	double CountDistance(Vec2 pos1, Vec2 pos2);//计算某两个英雄之间的距离
-	void SetAtkTarget(std::vector <Hero*>& atk, std::vector <Hero*>& tar, int atkNum, int tarNum);
-	void UpdateTarget(std::vector <Hero*>& atk, std::vector <Hero*>& tar, int atkNum, int tarNum);//更新棋子的攻击目标
+	void SetAtkTarget(Hero** atk, Hero** tar, int atkNum, int tarNum);
+	void UpdateTarget(Hero** atk, Hero** tar, int atkNum, int tarNum);//更新棋子的攻击目标
 	void ResetHero();//重置棋子状态
 	int IsEnd();//判断本回合是否结束，即是否分出胜负
 	void End();//做战斗结束后的处理，包括小小英雄的扣血
+	bool IsNext();
+	void Recover(Hero** hero,int num, double data);//恢复全体血量
 	virtual	void update(float dt);
 	void Destory();//注销所有定时器
+	void CallBack(float t);
 private:
-	std::vector <Hero*> self;
-	std::vector <Hero*> enemy;
-	//Hero* self[MaxHero];//我方上阵的英雄
-	//Hero* enemy[MaxHero];//敌方上阵的英雄
+	//std::vector <Hero*> self;
+	//std::vector <Hero*> enemy;
+	Hero* self[MaxHero];//我方上阵的英雄
+	Hero* enemy[MaxHero];//敌方上阵的英雄
 
-	Vec2 myField[MaxRow][MaxCol] =
-	{{ Vec2(665, 455), Vec2(770, 455), Vec2(875, 455), Vec2(980, 455), Vec2(1085, 455), Vec2(1190, 455)},
-	 {Vec2(665, 525), Vec2(770, 525), Vec2(875, 525), Vec2(980, 525), Vec2(1085, 525), Vec2(1190, 525)},
-	 {Vec2(665, 597), Vec2(770, 597), Vec2(875, 597), Vec2(980, 597), Vec2(1085, 597), Vec2(1190, 597)}};
-	Vec2 enemyField[MaxRow][MaxCol] =
-	{{Vec2(665, 385), Vec2(770, 385), Vec2(875, 385), Vec2(980, 385), Vec2(1085, 385), Vec2(1190, 385)},
-	 {Vec2(665, 315), Vec2(770, 315), Vec2(875, 315), Vec2(980, 315), Vec2(1085, 315), Vec2(1190, 315)},
-	 {Vec2(665, 245), Vec2(770, 245), Vec2(875, 245), Vec2(980, 245), Vec2(1085, 245), Vec2(1190, 245)}};
 	site* myPos;//记录我方上场英雄的位置
 	site* enPos;//记录敌方上场英雄的位置
 	Player* myPlayer;//我方小小英雄
@@ -50,6 +46,8 @@ private:
 	int enHeroNum;
 	int myLive;
 	int enLive;
+
+	bool isNext=0;
 };
 
 #endif

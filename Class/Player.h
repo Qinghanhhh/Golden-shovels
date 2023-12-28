@@ -21,14 +21,16 @@ struct site {
 	int y;
 };
 
+
+class Hero;
 class Player : public cocos2d::Sprite
 {
 private:
-	////还活着吗
-	//bool playerIsDead;
+	//还活着吗
+	bool playerIsDead;
 
-	////玩家血量
-	//int playerBlood;
+	//玩家血量
+	int playerBlood;
 
 	////金币
 	//int playerMoney;
@@ -51,16 +53,19 @@ private:
 	////玩家备战区棋子
 	//std::vector<Hero*> chessPreparePlayer;
 
-	//玩家上场棋子
-	std::vector<Hero*> chessWarPlayer;
+	showHPMP* myHP;//小小英雄的血条
 
-	site HeroPos[MaxHero];
+	Hero chessWarPlayer[MaxHero];//上阵的英雄
+
+	int heroNum = 0;//上阵英雄数量
+
+	site HeroPos[MaxHero];//应该没用
 public:
 	//ChessShop* chessShop;
     //Player(ChessShop* shop);
 
-	////血量减少
-	//void changeplayerBlood(int hurt);
+	//血量减少
+	void changeplayerBlood(int hurt);
 
 	////获取金币数量
 	//int getplayerMoney() const;
@@ -82,16 +87,25 @@ public:
 
 	////更新商店
 	//bool Update();
-	static Player* create();
 	Player();
+
+	static Player* create();
+
+	void SetHP(Vec2 pos);
 
 	int GetLv();
 
-	void SetHero(Hero* hero);
+	void SetHero(Hero* hero);//设置上场英雄，里面是测试用数据
 
-	std::vector <Hero*> GetWarHero();
+	void HeroInit();//英雄初始化
 
-	site* GetHeroPos();
+	Hero* GetWarHero();//传出上场英雄
+
+	bool IsDead() {
+		return playerIsDead;
+	}
+
+	int GetHeroNum();
 };
 
 
