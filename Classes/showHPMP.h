@@ -10,6 +10,7 @@ class showHPMP : public cocos2d::Sprite
 public:
     virtual bool init();
     static showHPMP* showHPMP::create();
+
 public:
     //…Ë÷√—™Ãı±≥æ∞  
     void setBackgroundTexture(const char* pName);
