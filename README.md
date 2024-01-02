@@ -7,7 +7,7 @@
 - 项目选题：**金铲铲之战（2D）**
 - 项目GitHub地址：[https://github.com/Qinghanhhh/Golden-shovels](https://github.com/Qinghanhhh/Golden-shovels)
 - 选用引擎：**Cocos2d-x 3.17**
-- 辅助软件：Photoshop 2022，csm-3d，VS2022
+- 辅助软件：Photoshop 2022，csm-3d，VS 2022
 - 支持平台：Windows
 
 ### 成员分工及贡献占比
