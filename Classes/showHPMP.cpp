@@ -1,17 +1,12 @@
 #include "showHPMP.h"  
 
-bool showHPMP::init()
+showHPMP::showHPMP()
 {
-    if (!Sprite::init())
-    {
-        return false;
-    }
     P_back = NULL;
     P_front = NULL;
-    total = 0;
-    P_current = 0;
-    P_scale = 1;
-    return true;
+    total = 0.0f;
+    P_current = 0.0f;
+    P_scale = 1.0f;
 }
 
 showHPMP* showHPMP::create()
@@ -26,24 +21,28 @@ showHPMP* showHPMP::create()
     return nullptr;
 }
 
-void showHPMP::setBackgroundTexture(const char* pName)
+void showHPMP::setBackgroundTexture(const std::string& pName)
 {
-    P_back = Sprite::create(pName);
+    P_back = CCSprite::create(pName);
     this->addChild(P_back);
 }
 
-void showHPMP::setForegroundTexture(const char* pName)
+void showHPMP::setForegroundTexture(const std::string& pName)
 {
-    P_front = Sprite::create(pName);
-    P_front->setAnchorPoint(Vec2(0.0f, 0.5f));//设置锚点  
-    P_front->setPosition(Vec2(-P_front->getContentSize().width * 0.5f, 0));
+    P_front = CCSprite::create(pName);
+    P_front->setAnchorPoint(ccp(0.0f, 0.5f));//设置锚点  
+    P_front->setPosition(ccp(-P_front->getContentSize().width * 0.5f, 0));
     this->addChild(P_front);
+}
+
+void showHPMP::changeColor(const std::string& pName) {
+    P_front->setTexture(pName);
 }
 
 void showHPMP::setTotalProgress(float data)
 {
     if (P_front == NULL) { return; }
-    P_scale = P_front->getContentSize().width / total;
+    P_scale = P_front->getContentSize().width / data;
     total = data;
 }
 
@@ -54,8 +53,8 @@ void showHPMP::setCurrentProgress(float progress)
     if (progress > total) { progress = total; }
     P_current = progress;
     float rectWidth = progress * P_scale;
-    const Point from = P_front->getTextureRect().origin;
-    const Rect rect = CCRectMake(from.x, from.y, rectWidth, P_front->getContentSize().height);
+    const CCPoint from = P_front->getTextureRect().origin;
+    const CCRect rect = CCRectMake(from.x, from.y, rectWidth, P_front->getContentSize().height);
     setForegroundTextureRect(rect);
 }
 
