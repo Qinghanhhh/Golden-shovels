@@ -83,11 +83,15 @@
   ## 五、游戏运行展示
 
   ### 初始界面
+  ---
   ![image](https://github.com/Qinghanhhh/Golden-shovels/assets/140044244/98f6489b-fd25-4557-818b-630524d7d7c2)
   
   ### 运行界面
+  ---
   ![image](https://github.com/Qinghanhhh/Golden-shovels/assets/140044244/d948308d-e821-4ec3-8ff9-ce6d994b0cd1)
+  
   ![image](https://github.com/Qinghanhhh/Golden-shovels/assets/140044244/baee8059-8e28-4c2b-ae60-1cbfdb4e8d76)
+  
   ![image](https://github.com/Qinghanhhh/Golden-shovels/assets/140044244/ac86cc2c-c461-4d9f-acac-9c41fa5f1549)
 
 
