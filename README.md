@@ -57,7 +57,8 @@
 5. 支持卡池和刷新商店卡牌
 
   ## 三、游戏整体结构设计
-  ---
+  --- 
+<img width="991" alt="b6b6017a3f05d450cb5a193744ddf8a" src="https://github.com/Qinghanhhh/Golden-shovels/assets/140044244/5f197418-e868-44e6-8d89-e3080e55350e">
 
   ## 四、项目亮点
 
